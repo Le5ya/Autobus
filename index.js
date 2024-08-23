@@ -14,6 +14,8 @@ const port = 3000;
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, "public")));
+
 const loadBuses = async () => {
   const data = await readFile(path.join(__dirname, "buses.json"), "utf-8");
   return JSON.parse(data);
@@ -68,11 +70,11 @@ const sendUpdatedData = async () => {
       bus.firstDepartureTime,
       bus.frequencyMinutes
     );
-    console.log("nextDeparture: ", nextDeparture);
+    //console.log("nextDeparture: ", nextDeparture);
     return {
       ...bus,
       nextDeparture: {
-        data: nextDeparture.toFormat("yyyy-MM-dd"),
+        date: nextDeparture.toFormat("yyyy-MM-dd"),
         time: nextDeparture.toFormat("HH:mm:ss"),
       },
     };
@@ -80,17 +82,21 @@ const sendUpdatedData = async () => {
   return updatedBuses;
 };
 
-const updatedBuses = sendUpdatedData();
-console.log("updatedBuses: ", updatedBuses);
-loadBuses();
+//const updatedBuses = sendUpdatedData();
+//console.log("updatedBuses: ", updatedBuses);
+//loadBuses();
+const sortBuses = (buses) =>
+  [...buses].sort((a, b) => {
+    new Date(`${a.nextDeparture.date}T${a.nextDeparture.time}`) -
+      new Date(`${b.nextDeparture.date}T${b.nextDeparture.time}`);
+  });
 
 app.get("/next-departure", async (req, res) => {
-  res.send("hello world!");
-
   try {
     const updatedBuses = await sendUpdatedData();
+    const sortedBuses = sortBuses(updatedBuses);
 
-    res.json(updatedBuses);
+    res.json(sortedBuses);
   } catch (error) {
     res.send("error");
   }
