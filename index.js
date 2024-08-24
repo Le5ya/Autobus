@@ -86,10 +86,11 @@ const sendUpdatedData = async () => {
 //console.log("updatedBuses: ", updatedBuses);
 //loadBuses();
 const sortBuses = (buses) =>
-  [...buses].sort((a, b) => {
-    new Date(`${a.nextDeparture.date}T${a.nextDeparture.time}`) -
-      new Date(`${b.nextDeparture.date}T${b.nextDeparture.time}`);
-  });
+  [...buses].sort(
+    (a, b) =>
+      new Date(`${a.nextDeparture.date}T${a.nextDeparture.time}`) -
+      new Date(`${b.nextDeparture.date}T${b.nextDeparture.time}`)
+  );
 
 app.get("/next-departure", async (req, res) => {
   try {
